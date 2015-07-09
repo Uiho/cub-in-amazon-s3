@@ -9,12 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CubInAmazonS3 implements CommandLineRunner  {
 	
-	@Autowired
-	private AmazonS3Upload amazonS3Upload;
+//	@Autowired
+//	private AmazonS3Upload amazonS3Upload;
 	
 	@Override
 	public void run(String... arg0) throws Exception {
-		amazonS3Upload.upload();
+//		amazonS3Upload.upload();
 	}
 	
     public static void main(String[] args) {

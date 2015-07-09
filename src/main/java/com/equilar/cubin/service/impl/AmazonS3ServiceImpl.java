@@ -11,6 +11,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.equilar.cubin.ob.ImageUploadObject;
 import com.equilar.cubin.service.AmazonS3Service;
 import com.equilar.cubin.util.AmazonS3Property;
 
@@ -23,7 +24,7 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
 	private static String AMAZON_DOMAIN = AmazonS3Property.AMAZON_DOMAIN.getValue();
 	private static String ENVIRONMENT = AmazonS3Property.ENVIRONMENT.getValue();
 	private static String PATH_SEPARATOR = "/";
-	private static String JPEG = ".jpg";
+	private static String PUNCTUATION = ".";
 	
 	
 	private static final Logger logger = Logger.getLogger(AmazonS3ServiceImpl.class);
@@ -38,15 +39,20 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
 	}
 
 	@Override
-	public String uploadFile(String personId, String path) {
+	public String uploadImageFile(ImageUploadObject imageObject) {
 		logger.info("****    Starting upload file    ****");
 		
-		logger.info("personId: "+personId);
-		logger.info("path: "+path);
+		logger.info("username: "+imageObject.getUsername());
+		logger.info("image_file_name: "+imageObject.getImageFileName());
+		logger.info("image_type: "+imageObject.getImageType());
+		logger.info("image_path_from_local: "+imageObject.getImagePathFromLocal());
+		logger.info("image_path_to_amazaon_s3: "+imageObject.getImagePathToAmazonS3());
+		
 		logger.info("BUCKET_NAME: "+BUCKET_NAME);
 		logger.info("AMAZON_BASE_URL: "+AMAZON_BASE_URL);
 		logger.info("AMAZON_DOMAIN: "+AMAZON_DOMAIN);
 		logger.info("ENVIRONMENT: "+ENVIRONMENT);
+		
 		
 		if (!s3client.doesBucketExist(BUCKET_NAME)) {
 			String errorMessage = "The specified bucket :[" + BUCKET_NAME + "] doesn't exist.";
@@ -55,14 +61,22 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
 		}
 		
 		String url = null;
-		File file = new File(path+PATH_SEPARATOR+personId+JPEG);
+		File file = new File(
+				imageObject.getImagePathFromLocal()
+				+PATH_SEPARATOR
+				+imageObject.getImageFileName()
+				+PUNCTUATION
+				+imageObject.getImageType());
 		logger.info("file path: "+file);
+		
 		
 		try{
 			if (file.exists()) {
-				String fileName = ENVIRONMENT + PATH_SEPARATOR + file.getName();
+				String fileName = ENVIRONMENT 
+						+ PATH_SEPARATOR +imageObject.getImagePathToAmazonS3() 
+						+ PATH_SEPARATOR + file.getName();
 	
-				logger.info("Found the image file to upload to amazon s3: [" + path + "]. Start to upload...");
+				logger.info("Found the image file to upload to amazon s3: [" + file.getPath() + "]. Start to upload...");
 				
 				logger.info("Checking file name : [" + fileName+ "]. To be ready to upload.");
 				
@@ -77,11 +91,11 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
 				}
 			}
 			else {
-				logger.warn("File does not exist. No uploading for: [" + path + "].");
+				logger.warn("File does not exist. No uploading for: [" + file.getPath() + "].");
 			}
 		
 		} catch (AmazonClientException ace) {
-			logger.info("Exception while uploading file:" + path);
+			logger.info("Exception while uploading file:" + file.getPath());
 			logger.error(ace);
 		}
 		return url;

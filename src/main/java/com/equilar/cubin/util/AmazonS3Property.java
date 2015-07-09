@@ -7,10 +7,6 @@ import java.util.ResourceBundle;
 
 public enum AmazonS3Property {
 	
-	PERSON_ID,
-	IMAGE_PATH,
-	
-	
 	AMAZON_ACCESS_KEY,
 	AMAZON_SECRET_KEY,
 	BUCKET_NAME,
